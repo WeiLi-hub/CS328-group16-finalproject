@@ -75,8 +75,10 @@ last_update_time = time.time()
 # TODO: list the class labels that you collected data for in the order of label_index (defined in labels.py)
 class_names = labels.activity_labels
 
-window_size = 100 # ~1 sec assuming 100 Hz sampling rate
-step_size = 100 # no overlap
+# ~1 sec assuming 100 Hz sampling rate
+# window_size = 100 
+window_size = 200
+step_size = 20 # no overlap
 index = 0 # to keep track of how many samples we have buffered so far
 reset_vars() # resets orientation variables
 
@@ -88,18 +90,26 @@ if classifier == None:
     print("Classifier is null; make sure you have trained it!")
     sys.exit()
     
-def predict(window):
+def predict(window_accel, window_gyro):
     """
     Given a window of accelerometer data, predict the activity label. 
     """
     
     # TODO: extract features over the window of data
+
+    # acceleration features
+    feature_name, x = extract_features(window_accel)
+
+    # gyro features
+    feature_name, gyro_features = extract_features(window_gyro)
     
-    feature_name, x = extract_features(window)
+    # combine accel feature and accel feature as a single instance
+    for f in gyro_features:
+        x.append(f)
     
     # TODO: use classifier.predict(feature_vector) to predict the class label.
     # Make sure your feature vector is passed in the expected format
-    
+     
     y = classifier.predict([x])
     
     # TODO: get the name of your predicted activity from 'class_names' using the returned label.
@@ -137,8 +147,6 @@ def update_graph(_counter):
 	global total_steps,step_init,stepvals,filtered_signal
 	
 	graphs = []
-   
-
 
 
 	# Plot accelerometer if available
@@ -166,6 +174,35 @@ def update_graph(_counter):
 					}
 				),
             	className="card",
+			)
+		)
+		
+
+	# Plot gyrocope
+	if (len(gyro_time) > 0):
+
+		data_gyro = [
+			go.Scatter(x=list(gyro_time), y=list(d), name=name)
+			for d, name in zip([gyro_x, gyro_y, gyro_z], ["X", "Y", "Z"])
+		]
+
+		graphs.append(
+			html.Div(
+				dcc.Graph(
+					id="gyrocope_graph",
+					figure={
+						"data": data_gyro,
+						"layout": go.Layout(
+							{
+								"title": "Gyrocope",
+								"xaxis": {"type": "date", "range": [min(gyro_time), max(gyro_time)]},
+								"yaxis": {"title": "Gyrocope ms<sup>-2</sup>","range": [-25,25]},
+							}
+						)
+
+					}
+				),
+				className="card",
 			)
 		)
 		
@@ -198,33 +235,6 @@ def update_graph(_counter):
 			)
 		)
 
-	# Plot gyrocope
-	if (len(gyro_time) > 0):
-
-		data_gyro = [
-			go.Scatter(x=list(gyro_time), y=list(d), name=name)
-			for d, name in zip([gyro_x, gyro_y, gyro_z], ["X", "Y", "Z"])
-		]
-
-		graphs.append(
-			html.Div(
-				dcc.Graph(
-					id="gyrocope_graph",
-					figure={
-						"data": data_gyro,
-						"layout": go.Layout(
-							{
-								"title": "Gyrocope",
-								"xaxis": {"type": "date", "range": [min(gyro_time), max(gyro_time)]},
-								"yaxis": {"title": "Gyrocope ms<sup>-2</sup>","range": [-25,25]},
-							}
-						)
-
-					}
-				),
-				className="card",
-			)
-		)
 
 	# Plot filtered_signal if available
 
@@ -243,7 +253,7 @@ def update_graph(_counter):
 	activity = None
 
 	if len(sensor_data) > window_size:
-		activity = predict(np.asarray(sensor_data[-window_size:]))
+		activity = predict(np.asarray(sensor_data[-window_size:]), np.asarray(gyro_data[-window_size:]))
 
     #######################################################################################################
 

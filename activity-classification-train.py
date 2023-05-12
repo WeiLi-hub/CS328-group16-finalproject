@@ -68,7 +68,7 @@ data_gyro = np.nan_to_num(data_gyro)
 #
 # -----------------------------------------------------------------------------
 
-window_size = 20
+window_size = 200
 step_size = 20
 
 # sampling rate should be about 100 Hz (sensor logger app); you can take a brief window to confirm this
@@ -86,6 +86,8 @@ sys.stdout.flush()
 
 X = []
 Y = []
+
+# accel
 feature_names = []
 for i,window_with_timestamp_and_label in slidingWindow(data, window_size, step_size):
     window = window_with_timestamp_and_label[:,2:-1]
@@ -94,19 +96,37 @@ for i,window_with_timestamp_and_label in slidingWindow(data, window_size, step_s
     feature_names, x = extract_features(window)
     X.append(x)
     Y.append(window_with_timestamp_and_label[10, -1])
+# print(np.array(X).shape)
 
+temp_x = []
+fn = []
+
+# gyro
 for i,window_with_timestamp_and_label in slidingWindow(data_gyro, window_size, step_size):
     window = window_with_timestamp_and_label[:,2:-1]
-    # print("window = ")
-    # print(window)
-    feature_names, x = extract_features(window)
-    X.append(x)
-    Y.append(window_with_timestamp_and_label[10, -1])
+    fn, x = extract_features(window)
+    temp_x.append(x)
+# print(np.array(temp_x).shape)
+
+
+# append gyro features to the feature name
+for f in fn:
+    feature = f + '_gyro'
+    feature_names.append(feature)
+
+# append gyro features with the accelerometer features
+
+for i in range(len(X)):
+    accels_x = X[i]
+    for j in range(len(temp_x[0])):
+        accels_x.append(temp_x[i][j])
     
 X = np.asarray(X)
 Y = np.asarray(Y)
 n_features = len(X)
-    
+# print(X.shape)
+
+
 print("Finished feature extraction over {} windows".format(len(X)))
 print("Unique labels found: {}".format(set(Y)))
 print("\n")
@@ -118,9 +138,6 @@ sys.stdout.flush()
 #
 # -----------------------------------------------------------------------------
 
-
-# TODO: split data into train and test datasets using 10-fold cross validation
-cv = sklearn.model_selection.KFold(n_splits=10, random_state=None, shuffle=True)
 
 """
 TODO: iterating over each fold, fit a decision tree classifier on the training set.
