@@ -13,8 +13,9 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.tree import export_graphviz
 from features import extract_features
 from util import slidingWindow, reorient, reset_vars
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.ensemble import RandomForestClassifier
+import matplotlib.pyplot as plt
 import pickle
 
 import labels
@@ -156,6 +157,7 @@ for each fold.
 # total_precision = [0.0, 0.0, 0.0]
 # total_recall = [0.0, 0.0, 0.0]
 
+# cv = sklearn.model_selection.KFold(n_splits=10, random_state=None, shuffle=True)
 # for i, (train_index, test_index) in enumerate(cv.split(X)):
 #     X_train, X_test = X[train_index], X[test_index]
 #     y_train, y_test = Y[train_index], Y[test_index]
@@ -198,25 +200,27 @@ for each fold.
 #     pickle.dump(best_classifier, f)
 
 
-# # %%
+# # # %%
 
 
 
 # TODO: split data into train and test datasets using 10-fold cross validation
-cv = sklearn.model_selection.KFold(n_splits=10, random_state=None, shuffle=True)
 
-"""
-TODO: iterating over each fold, fit a decision tree classifier on the training set.
-Then predict the class labels for the test set and compute the confusion matrix
-using predicted labels and ground truth values. Print the accuracy, precision and recall
-for each fold.
-"""
+# """
+# TODO: iterating over each fold, fit a decision tree classifier on the training set.
+# Then predict the class labels for the test set and compute the confusion matrix
+# using predicted labels and ground truth values. Print the accuracy, precision and recall
+# for each fold.
+# """
 
 # TODO: calculate and print the average accuracy, precision and recall values over all 10 folds
 accuracy = 0
 precision = 0
 recall = 0
 f1 = 0
+
+
+cv = sklearn.model_selection.KFold(n_splits=10, random_state=None, shuffle=True)
 
 tree = sklearn.tree.DecisionTreeClassifier(criterion="entropy", max_depth=4)
 
@@ -234,6 +238,11 @@ for i, (train_index, test_index) in enumerate(cv.split(X, Y)):
     f1 +=f1_score(y_test, y_pred, average='macro')
 
     print(cm)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels.activity_labels)
+    disp.plot()
+    # plt.show()
+    plt.savefig('confusion_matrix.png')
+
     print('accuracy: ', accuracy_score(y_test, y_pred))
     print('precision: ', precision_score(y_test, y_pred, average='macro'))
     print('recall: ', recall_score(y_test, y_pred, average='macro'))
