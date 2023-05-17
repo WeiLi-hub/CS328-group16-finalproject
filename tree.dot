@@ -18,7 +18,7 @@ edge [fontname="helvetica"] ;
 6 -> 7 ;
 8 [label="entropy = 0.855\nsamples = 25\nvalue = [18, 7, 0]"] ;
 6 -> 8 ;
-9 [label="z_mean_gyro <= 1.075\nentropy = 0.129\nsamples = 619\nvalue = [11, 608, 0]"] ;
+9 [label="y_variance_gyro <= 0.719\nentropy = 0.129\nsamples = 619\nvalue = [11, 608, 0]"] ;
 5 -> 9 ;
 10 [label="entropy = 0.079\nsamples = 614\nvalue = [6, 608, 0]"] ;
 9 -> 10 ;

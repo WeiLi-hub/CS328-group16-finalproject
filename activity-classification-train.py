@@ -238,10 +238,10 @@ for i, (train_index, test_index) in enumerate(cv.split(X, Y)):
     f1 +=f1_score(y_test, y_pred, average='macro')
 
     print(cm)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels.activity_labels)
-    disp.plot()
+    # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels.activity_labels)
+    # disp.plot()
     # plt.show()
-    plt.savefig('confusion_matrix.png')
+    # plt.savefig('confusion_matrix.png')
 
     print('accuracy: ', accuracy_score(y_test, y_pred))
     print('precision: ', precision_score(y_test, y_pred, average='macro'))
@@ -260,9 +260,25 @@ print("The average f1 is {}".format(f1 / 10.0))
 # TODO: train the decision tree classifier on entire dataset
 tree.fit(X, Y)
 
+y_pred = tree.predict(X)
+cm = sklearn.metrics.confusion_matrix(y_true=Y, y_pred=y_pred)
+
+accuracy += accuracy_score(Y, y_pred)
+precision += precision_score(Y, y_pred, average='macro')
+recall +=  recall_score(Y, y_pred, average='macro')
+f1 +=f1_score(Y, y_pred, average='macro')
+
+print(cm)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels.activity_labels)
+disp.plot()
+# plt.show()
+plt.savefig('confusion_matrix.png') 
+
+
+
 # TODO: Save the decision tree visualization to disk - replace 'tree' with your decision tree and run the below line
 export_graphviz(tree, out_file='tree.dot', feature_names = feature_names)
-
+# print(feature_names)
 # dot -Tpng tree.dot -o tree.png
 
 # TODO: Save the classifier to disk - replace 'tree' with your decision tree and run the below line
