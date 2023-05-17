@@ -3,8 +3,8 @@
 ## Title : Badminton Serve Classification
 
 ## Contributions: 
-Member 1 Wei Li: Data Collection/Preprocessing, Model Training and Validation
-Member 2 Tengfei Louie: Data Collection/Preprocessing, Report Writing 
+Member 1 Wei Li: Data Collection/Preprocessing, Model Training and Validation  
+Member 2 Tengfei Louie: Data Collection/Preprocessing, Report Writing  
 Member 3 JiaHui Yu: Data Collection/Preprocessing, Model Training and Validation
 
 
